@@ -1,5 +1,5 @@
 {
-  "name": "react-native-phone-input",
+  "name": "rn-falcon-phone-input",
   "version": "0.2.5",
   "description": "Phone input box for React Native",
   "main": "dist/index.js",
