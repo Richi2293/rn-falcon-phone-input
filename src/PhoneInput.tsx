@@ -1,8 +1,8 @@
 import React, { Component, useState, useEffect } from "react";
 import { Image, TextInput, TouchableWithoutFeedback, View } from "react-native";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 
-import Country from "./country";
+import Country, { SetCustomCountriesData } from "./country";
 import Flags from "./resources/flags";
 import PhoneNumber from "./phoneNumber";
 import styles from "./styles";
@@ -49,7 +49,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onSelectCountry, onPressFlag, o
   const [refPicker, setRefPicker] = useState(null);
   const [refInputPhone, setRefInputPhone] = useState(null);
   if (countriesList) {
-    Country.setCustomCountriesData(countriesList);
+    SetCustomCountriesData(countriesList);
   }
   const countryData = PhoneNumber.getCountryDataByCode(initialCountry);
   const [formattedNumber, setFormattedNumber] = useState(countryData ? `+${countryData.dialCode}` : "");

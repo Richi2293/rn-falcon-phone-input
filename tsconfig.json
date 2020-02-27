@@ -11,6 +11,7 @@
       "types": ["react", "react-native"],
       "skipLibCheck": true,
       "noImplicitAny": false,
+      "strictNullChecks":false
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules"]
