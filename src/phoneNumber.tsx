@@ -1,13 +1,13 @@
 import _ from 'lodash';
 
 import Country from './country';
-import numberType from './resources/numberType.json';
+import numberType from './resources/numberType';
 
 const libPhoneNumber = require('google-libphonenumber');
 const phoneUtil = libPhoneNumber.PhoneNumberUtil.getInstance();
 const asYouTypeFormatter = libPhoneNumber.AsYouTypeFormatter;
 
-let instance = null;
+let instance: any = null;
 
 class PhoneNumber {
   static getInstance() {
@@ -21,7 +21,7 @@ class PhoneNumber {
     return Country.getAll();
   }
 
-  getDialCode(number) {
+  getDialCode(number: any) {
     let dialCode = '';
     // only interested in international numbers (starting with a plus)
     if (number.charAt(0) === '+') {
@@ -48,28 +48,28 @@ class PhoneNumber {
     return dialCode;
   }
 
-  getNumeric(str) {
+  getNumeric(str: any) {
     return str.replace(/\D/g, '');
   }
 
-  isNumeric(n) {
+  isNumeric(n: any) {
     return !isNaN(parseFloat(n)) && isFinite(n);
   }
 
-  getCountryCodeOfNumber(number) {
+  getCountryCodeOfNumber(number: any) {
     const dialCode = this.getDialCode(number);
     const numeric = this.getNumeric(dialCode);
     const countryCode = Country.getCountryCodes()[numeric];
 
     // countryCode[0] can be null -> get first element that is not null
     if (countryCode) {
-      return _.first(countryCode.filter(iso2 => iso2));
+      return _.first(countryCode.filter((iso2: any) => iso2));
     }
 
     return '';
   }
 
-  parse(number, iso2) {
+  parse(number: any, iso2: any) {
     try {
       return phoneUtil.parse(number, iso2);
     } catch (err) {
@@ -78,7 +78,7 @@ class PhoneNumber {
     }
   }
 
-  isValidNumber(number, iso2) {
+  isValidNumber(number: any, iso2: any) {
     const phoneInfo = this.parse(number, iso2);
 
     if (phoneInfo) {
@@ -88,25 +88,25 @@ class PhoneNumber {
     return false;
   }
 
-  format(number, iso2) {
+  format(number: any, iso2: any) {
     const formatter = new asYouTypeFormatter(iso2)
     let formatted;
 
     number.replace(/-/g, '')
       .replace(/ /g, '')
       .split('')
-      .forEach(n => formatted = formatter.inputDigit(n));
+      .forEach((n: any) => formatted = formatter.inputDigit(n));
 
     return formatted;
   }
 
-  getNumberType(number, iso2) {
+  getNumberType(number: any, iso2: any) {
     const phoneInfo = this.parse(number, iso2);
     const type = phoneInfo ? phoneUtil.getNumberType(phoneInfo) : -1;
-    return _.findKey(numberType, noType => noType === type);
+    return _.findKey((numberType: any, noType: any) => noType === type);
   }
 
-  getCountryDataByCode(iso2) {
+  getCountryDataByCode(iso2: any) {
     return Country.getCountryDataByCode(iso2);
   }
 }

@@ -32,7 +32,7 @@ class Country {
   getAll() {
     if (!this.countries) {
       this.countries = orderBy(
-        this.countriesData || require('./resources/countries.json'),
+        this.countriesData || require('./resources/countries.json.js'),
         ['name'],
         ['asc'],
       );

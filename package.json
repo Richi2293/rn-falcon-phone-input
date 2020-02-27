@@ -1,14 +1,16 @@
 {
   "name": "react-native-phone-input",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Phone input box for React Native",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "postversion": "yarn build"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:thegamenicorus/react-native-phone-input.git"
+    "url": "git@github.com:Richi2293/rn-falcon-phone-input.git"
   },
   "keywords": [
     "react-native",
@@ -24,17 +26,26 @@
     "android"
   ],
   "dependencies": {
+    "@types/lodash": "^4.14.149",
     "google-libphonenumber": "^3.2.2",
-    "lodash": "^4.17.4",
+    "lodash": "4.17.15",
     "prop-types": "^15.5.10"
   },
-  "peerDependencies": {
-    "react-native": ">= 0.25"
+  "devDependencies": {
+    "@babel/runtime": "7.7.4",
+    "@types/react": "16.9.13",
+    "@types/react-native": "0.60.23",
+    "react": "16.12.0",
+    "react-native": "0.61.5",
+    "typescript": "3.7.2"
   },
-  "author": "Watcharachai Kanjaikaew (https://github.com/thegamenicorus)",
+  "peerDependencies": {
+    "react-native": ">= 0.55"
+  },
+  "author": "Riccardo Lorenzi (https://github.com/Richi2293)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/thegamenicorus/react-native-phone-input/issues"
+    "url": "https://github.com/Richi2293/rn-falcon-phone-input/issues"
   },
-  "homepage": "https://github.com/thegamenicorus/react-native-phone-input"
+  "homepage": "https://github.com/Richi2293/rn-falcon-phone-input"
 }

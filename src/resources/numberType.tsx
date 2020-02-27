@@ -1,4 +1,5 @@
-{
+
+export default {
   "FIXED_LINE": 0,
   "MOBILE": 1,
   "FIXED_LINE_OR_MOBILE": 2,
