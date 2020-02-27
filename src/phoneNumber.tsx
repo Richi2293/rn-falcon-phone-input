@@ -1,7 +1,94 @@
 import _ from 'lodash';
 
-import Country from './country';
+import Country, { getCountryDataByCodeC, getCountryCodes } from './country';
 import numberType from './resources/numberType';
+
+const libPhoneNumber = require('google-libphonenumber');
+const phoneUtil = libPhoneNumber.PhoneNumberUtil.getInstance();
+const asYouTypeFormatter = libPhoneNumber.AsYouTypeFormatter;
+
+let instance: any = null;
+
+
+interface PhoneNumberProps {
+
+}
+
+const PhoneNumber: React.FC<PhoneNumberProps> = ({ }) => {
+
+  return (
+    instance
+  );
+
+};
+
+PhoneNumber.defaultProps = {
+
+} as Partial<PhoneNumberProps>
+
+
+export default PhoneNumber;
+
+
+
+export const getCountryDataByCode = (iso2: any) => {
+  return getCountryDataByCodeC(iso2);
+}
+
+export const PNgetDialCode = (number: any) => {
+  let dialCode = '';
+  // only interested in international numbers (starting with a plus)
+  if (number.charAt(0) === '+') {
+    let numericChars = '';
+    // iterate over chars
+    for (let i = 0; i < number.length; i++) {
+      const c = number.charAt(i);
+      // if char is number
+      if (isNumeric(c)) {
+        numericChars += c;
+        // if current numericChars make a valid dial code
+        // if (this.countryCodes[numericChars]) {
+        if (getCountryCodes()[numericChars]) {
+          // store the actual raw string (useful for matching later)
+          dialCode = number.substr(0, i + 1);
+        }
+        // longest dial code is 4 chars
+        if (numericChars.length === 4) {
+          break;
+        }
+      }
+    }
+  }
+  return dialCode;
+}
+
+const isNumeric = (n: any) => {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+export const PNgetCountryCodeOfNumber = (number: any) => {
+  const dialCode = PNgetDialCode(number);
+  const numeric = getNumeric(dialCode);
+  const countryCode = getCountryCodes()[numeric];
+
+  // countryCode[0] can be null -> get first element that is not null
+  if (countryCode) {
+    let data = _.first(countryCode.filter((iso2: any) => iso2));
+    if(data != null) {
+      return data;
+    }
+  }
+
+  return '';
+}
+
+
+const getNumeric = (str: any) => {
+  return str.replace(/\D/g, '');
+}
+
+
+/*
 
 const libPhoneNumber = require('google-libphonenumber');
 const phoneUtil = libPhoneNumber.PhoneNumberUtil.getInstance();
@@ -112,3 +199,5 @@ class PhoneNumber {
 }
 
 export default PhoneNumber.getInstance();
+
+*/

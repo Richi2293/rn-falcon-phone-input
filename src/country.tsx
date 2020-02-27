@@ -4,16 +4,37 @@ import { find, orderBy } from 'lodash';
 
 
 let instance = null;
+const [instanceState, setInstanceState] = useState(null);
+const [countryCodes, setCountryCodes] = useState([]);
+const [countriesData, setCountriesData] = useState(null);
+const [countries, setCountries] = useState(null);
+
+
+const getAll = () => {
+  if (!countries) {
+    var newCountries: any = countries;
+    newCountries = orderBy(
+      countriesData || require('./resources/countries.json'),
+      ['name'],
+      ['asc'],
+    );
+    setCountries(newCountries);
+  }
+  if(countries) {
+    return countries;
+  }
+  return null;
+}
 
 interface CountryProps {
   
 }
 
 const Country: React.FC<CountryProps> = ({ }) => {
-  const [instanceState, setInstanceState] = useState(null);
-  const [countryCodes, setCountryCodes] = useState([]);
-  const [countriesData, setCountriesData] = useState(null);
-  const [countries, setCountries] = useState(null);
+  // const [instanceState, setInstanceState] = useState(null);
+  // const [countryCodes, setCountryCodes] = useState([]);
+  // const [countriesData, setCountriesData] = useState(null);
+  // const [countries, setCountries] = useState(null);
 
   const getInstance = () => {
     // if (!instance) {
@@ -24,53 +45,6 @@ const Country: React.FC<CountryProps> = ({ }) => {
 
   const setCustomCountriesData = (json: any) => {
     setCountriesData(json);
-  }
-
-  const addCountryCode = (iso2: any, dialCode: any, priority: any) => {
-    if (!(dialCode in countryCodes)) {
-      let newCountryCodes: any = countryCodes;
-      newCountryCodes[dialCode] = [];
-      setCountryCodes(newCountryCodes);
-    }
-
-    const index = priority || 0;
-    let newCountryCodes: any = countryCodes;
-    newCountryCodes[dialCode][index] = iso2;
-    setCountryCodes(newCountryCodes);
-  }
-
-  const getAll = () => {
-    if (!countries) {
-      var newCountries: any = countries;
-      newCountries = orderBy(
-        countriesData || require('./resources/countries.json'),
-        ['name'],
-        ['asc'],
-      );
-      setCountries(newCountries);
-    }
-    if(countries) {
-      return countries;
-    }
-    return null;
-  }
-
-  const getCountryCodes = () => {
-    if (!countryCodes.length) {
-      getAll().map((country) => {
-        addCountryCode(country.iso2, country.dialCode, country.priority);
-        if (country.areaCodes) {
-          country.areaCodes.map((areaCode) => {
-            addCountryCode(country.iso2, country.dialCode + areaCode, null);
-          });
-        }
-      });
-    }
-    return countryCodes;
-  }
-
-  const getCountryDataByCode = (iso2: any) => {
-    return find(getAll(), (country: any) => country.iso2 === iso2);
   }
 
   return getInstance();
@@ -97,6 +71,36 @@ SetCustomCountriesData.defaultProps = {
 } as Partial<SetCustomCountriesDataProps>
 
 
+export const getCountryDataByCodeC = (iso2: any) => {
+  return find(getAll(), (country: any) => country.iso2 === iso2);
+}
+
+const addCountryCode = (iso2: any, dialCode: any, priority: any) => {
+  if (!(dialCode in countryCodes)) {
+    let newCountryCodes: any = countryCodes;
+    newCountryCodes[dialCode] = [];
+    setCountryCodes(newCountryCodes);
+  }
+
+  const index = priority || 0;
+  let newCountryCodes: any = countryCodes;
+  newCountryCodes[dialCode][index] = iso2;
+  setCountryCodes(newCountryCodes);
+}
+
+export const getCountryCodes = () => {
+  if (!countryCodes.length) {
+    getAll().map((country) => {
+      addCountryCode(country.iso2, country.dialCode, country.priority);
+      if (country.areaCodes) {
+        country.areaCodes.map((areaCode) => {
+          addCountryCode(country.iso2, country.dialCode + areaCode, null);
+        });
+      }
+    });
+  }
+  return countryCodes;
+}
 
 /*
 let instance = null;

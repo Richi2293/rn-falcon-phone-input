@@ -2,9 +2,9 @@ import React, { Component, useState, useEffect } from "react";
 import { Image, TextInput, TouchableWithoutFeedback, View } from "react-native";
 // import PropTypes from "prop-types";
 
-import Country, { SetCustomCountriesData } from "./country";
-import Flags from "./resources/flags";
-import PhoneNumber from "./phoneNumber";
+import Country, { SetCustomCountriesData, getCountryDataByCodeC } from "./country";
+import Flags, { getFlag } from "./resources/flags";
+import PhoneNumber, { getCountryDataByCode, PNgetDialCode, PNgetCountryCodeOfNumber } from "./phoneNumber";
 import styles from "./styles";
 import CountryPicker from "./countryPicker";
 
@@ -51,7 +51,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onSelectCountry, onPressFlag, o
   if (countriesList) {
     SetCustomCountriesData(countriesList);
   }
-  const countryData = PhoneNumber.getCountryDataByCode(initialCountry);
+  const countryData = getCountryDataByCode(initialCountry);
   const [formattedNumber, setFormattedNumber] = useState(countryData ? `+${countryData.dialCode}` : "");
   const [iso2, setIso2] = useState(initialCountry);
 
@@ -64,17 +64,15 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onSelectCountry, onPressFlag, o
   });
 
   const updateFlagAndFormatNumber = (number: any, actionAfterSetState: any = null) => {
-    let iso2 = getISOCode() || initialCountry;
+    let iso2: any = getISOCode() || initialCountry;
     let formattedPhoneNumber = number;
     if (number) {
       const countryCode = getCountryCode();
       if (formattedPhoneNumber[0] !== "+" && countryCode !== null) {
         formattedPhoneNumber = '+' + countryCode.toString() + formattedPhoneNumber.toString();
       }
-      formattedPhoneNumber = allowZeroAfterCountryCode
-        ? formattedPhoneNumber
-        : possiblyEliminateZeroAfterCountryCode(formattedPhoneNumber);
-      iso2 = PhoneNumber.getCountryCodeOfNumber(formattedPhoneNumber);
+      formattedPhoneNumber = allowZeroAfterCountryCode ? formattedPhoneNumber : possiblyEliminateZeroAfterCountryCode(formattedPhoneNumber);
+      iso2 = PNgetCountryCodeOfNumber(formattedPhoneNumber);
     }
     // this.setState({ iso2, formattedNumber: formattedPhoneNumber, inputValue: number }, actionAfterSetState);
     setIso2(iso2);
@@ -90,12 +88,12 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onSelectCountry, onPressFlag, o
   }
 
   const getCountryCode = () => {
-    const countryData = PhoneNumber.getCountryDataByCode(iso2);
+    const countryData = getCountryDataByCode(iso2);
     return countryData ? countryData.dialCode : null;
   }
 
   const possiblyEliminateZeroAfterCountryCode = (number: any) => {
-    const dialCode = PhoneNumber.getDialCode(number);
+    const dialCode = PNgetDialCode(number);
     return number.startsWith(`${dialCode}0`)
       ? dialCode + number.substr(dialCode.length + 1)
       : number;
@@ -129,7 +127,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onSelectCountry, onPressFlag, o
 
   const selectCountry = (iso2: any) => {
     if (iso2 !== iso2) {
-      const countryData = PhoneNumber.getCountryDataByCode(iso2);
+      const countryData = getCountryDataByCode(iso2);
       if (countryData) {
         setIso2(iso2);
         setFormattedNumber(`+${countryData.dialCode}`);
@@ -150,7 +148,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onSelectCountry, onPressFlag, o
         disabled={disabled}
       >
         <Image
-          source={Flags.get(iso2)}
+          source={getFlag(iso2)}
           style={[styles.flag, flagStyle]}
         />
       </TouchableWithoutFeedback>
