@@ -4,4 +4,5 @@
 //     export * from "./";
 // } 
 
-export * from "./PhoneInput";
+// export * from "./PhoneInput";
+export { default } from "./PhoneInput";

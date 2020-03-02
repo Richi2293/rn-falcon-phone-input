@@ -13,17 +13,17 @@ class App extends Component {
       value: ""
     };
 
-    this.updateInfo = this.updateInfo.bind(this);
+    // this.updateInfo = this.updateInfo.bind(this);
     this.renderInfo = this.renderInfo.bind(this);
   }
 
-  updateInfo() {
-    this.setState({
-      valid: this.phone.isValidNumber(),
-      type: this.phone.getNumberType(),
-      value: this.phone.getValue()
-    });
-  }
+  // updateInfo() {
+  //   this.setState({
+  //     valid: this.phone.isValidNumber(),
+  //     type: this.phone.getNumberType(),
+  //     value: this.phone.getValue()
+  //   });
+  // }
 
   renderInfo() {
     if (this.state.value) {
@@ -51,9 +51,6 @@ class App extends Component {
     return (
       <View style={styles.container}>
         <PhoneInput
-          ref={ref => {
-            this.phone = ref;
-          }}
         />
 
         <TouchableOpacity onPress={this.updateInfo} style={styles.button}>

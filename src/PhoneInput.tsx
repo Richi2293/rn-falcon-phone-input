@@ -1,10 +1,9 @@
 import React, { Component, useState, useEffect } from "react";
-import { Image, TextInput, TouchableWithoutFeedback, View } from "react-native";
-// import PropTypes from "prop-types";
+import { Image, TextInput, TouchableWithoutFeedback, View, Text } from "react-native";
 
-import Country, { SetCustomCountriesData, getCountryDataByCodeC } from "./country";
-import Flags, { getFlag } from "./resources/flags";
-import PhoneNumber, { getCountryDataByCode, PNgetDialCode, PNgetCountryCodeOfNumber } from "./phoneNumber";
+import Country from "./country";
+import Flags from "./resources/flags";
+import PhoneNumber from "./phoneNumber";
 import styles from "./styles";
 import CountryPicker from "./countryPicker";
 
@@ -39,28 +38,27 @@ interface PhoneInputProps {
 
 const PhoneInput: React.FC<PhoneInputProps> = ({ onSelectCountry, onPressFlag, onChangePhoneNumber, allowZeroAfterCountryCode, value, countriesList, disabled, initialCountry, textComponent, style, flagStyle, offset, textStyle, textProps, pickerButtonColor, pickerButtonTextStyle, cancelText, cancelTextStyle, confirmText, confirmTextStyle, pickerBackgroundColor, pickerItemStyle, onPressCancel, onPressConfirm }) => {
 
-  // static setCustomCountriesData(json) {
-  //   Country.setCustomCountriesData(json);
-  // }
-
   const [inputValue, setInputValue] = useState("0");
   const [valueState, setValue] = useState(null);
   const [disabledState, setDisabled] = useState(false);
   const [refPicker, setRefPicker] = useState(null);
   const [refInputPhone, setRefInputPhone] = useState(null);
+
+
   if (countriesList) {
-    SetCustomCountriesData(countriesList);
+    Country({SetCustomCountriesDataRequest: true, countriesList: countriesList});
   }
-  const countryData = getCountryDataByCode(initialCountry);
+
+  // const countryData: any = getCountryDataByCode(initialCountry);
+  const countryData: any = PhoneNumber({getCountryDataByCodeRequest: true, iso2: initialCountry});
   const [formattedNumber, setFormattedNumber] = useState(countryData ? `+${countryData.dialCode}` : "");
   const [iso2, setIso2] = useState(initialCountry);
 
-
   useEffect(() => {
     // didMount
-    if (value) {
-      updateFlagAndFormatNumber(value);
-    }
+    // if (value) {
+    //   updateFlagAndFormatNumber(value);
+    // }
   });
 
   const updateFlagAndFormatNumber = (number: any, actionAfterSetState: any = null) => {
@@ -68,19 +66,20 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onSelectCountry, onPressFlag, o
     let formattedPhoneNumber = number;
     if (number) {
       const countryCode = getCountryCode();
-      if (formattedPhoneNumber[0] !== "+" && countryCode !== null) {
-        formattedPhoneNumber = '+' + countryCode.toString() + formattedPhoneNumber.toString();
-      }
-      formattedPhoneNumber = allowZeroAfterCountryCode ? formattedPhoneNumber : possiblyEliminateZeroAfterCountryCode(formattedPhoneNumber);
-      iso2 = PNgetCountryCodeOfNumber(formattedPhoneNumber);
+      // if (formattedPhoneNumber[0] !== "+" && countryCode !== null) {
+      //   formattedPhoneNumber = '+' + countryCode.toString() + formattedPhoneNumber.toString();
+      // }
+      // formattedPhoneNumber = allowZeroAfterCountryCode ? formattedPhoneNumber : possiblyEliminateZeroAfterCountryCode(formattedPhoneNumber);
+      // iso2 = PhoneNumber({PNgetCountryCodeOfNumberRequest: true, PNdialNumber: formattedPhoneNumber});
+      
     }
     // this.setState({ iso2, formattedNumber: formattedPhoneNumber, inputValue: number }, actionAfterSetState);
-    setIso2(iso2);
-    setFormattedNumber(formattedPhoneNumber);
-    setInputValue(number);
-    if (actionAfterSetState) {
-      actionAfterSetState();
-    }
+    // setIso2(iso2);
+    // setFormattedNumber(formattedPhoneNumber);
+    // setInputValue(number);
+    // if (actionAfterSetState) {
+    //   actionAfterSetState();
+    // }
   }
 
   const getISOCode = () => {
@@ -88,12 +87,13 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onSelectCountry, onPressFlag, o
   }
 
   const getCountryCode = () => {
-    const countryData = getCountryDataByCode(iso2);
-    return countryData ? countryData.dialCode : null;
+    const countryData: any = PhoneNumber({getCountryDataByCodeRequest: true, iso2: initialCountry});
+    // return countryData ? countryData.dialCode : null;
+    return '';
   }
 
   const possiblyEliminateZeroAfterCountryCode = (number: any) => {
-    const dialCode = PNgetDialCode(number);
+    const dialCode: any = PhoneNumber({PNgetDialCodeRequest: true, PNdialNumber: number});
     return number.startsWith(`${dialCode}0`)
       ? dialCode + number.substr(dialCode.length + 1)
       : number;
@@ -117,20 +117,24 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onSelectCountry, onPressFlag, o
     // }
   }
 
-  const focus = () => {
-    // this.inputPhone.focus();
-  }
+  // const focus = () => {
+  // this.inputPhone.focus();
+  // }
 
-  const blur = () => {
-    // this.inputPhone.blur();
-  }
+  // const blur = () => {
+  // this.inputPhone.blur();
+  // }
 
   const selectCountry = (iso2: any) => {
     if (iso2 !== iso2) {
-      const countryData = getCountryDataByCode(iso2);
+      const countryData: any = PhoneNumber({getCountryDataByCodeRequest: true, iso2: initialCountry});
       if (countryData) {
         setIso2(iso2);
-        setFormattedNumber(`+${countryData.dialCode}`);
+        let dialCode = '';
+        if ('dialCode' in countryData) {
+          dialCode = `+${countryData.dialCode}`;
+        }
+        setFormattedNumber(dialCode);
         updateFlagAndFormatNumber(inputValue)
         if (onSelectCountry) {
           onSelectCountry(iso2);
@@ -139,8 +143,9 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onSelectCountry, onPressFlag, o
     }
   }
 
-
   const TextComponent = textComponent || TextInput;
+  let imgTest: any = Flags({ flag: iso2 });
+
   return (
     <View style={[styles.container, style]}>
       <TouchableWithoutFeedback
@@ -148,10 +153,11 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onSelectCountry, onPressFlag, o
         disabled={disabled}
       >
         <Image
-          source={getFlag(iso2)}
+          source={imgTest}
           style={[styles.flag, flagStyle]}
         />
       </TouchableWithoutFeedback>
+
       <View style={{ flex: 1, marginLeft: offset || 10 }}>
         <TextComponent
           ref={(ref: any) => {
@@ -169,24 +175,24 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ onSelectCountry, onPressFlag, o
           {...textProps}
         />
       </View>
-
+      {/*
       <CountryPicker
         ref={(ref: any) => {
           setRefPicker(ref);
         }}
-        selectedCountry={iso2}
+        selectedCountryProps={iso2}
         onSubmit={selectCountry}
-        buttonColor={pickerButtonColor}
+        buttonColorProps={pickerButtonColor}
         buttonTextStyle={pickerButtonTextStyle}
         cancelText={cancelText}
         cancelTextStyle={cancelTextStyle}
         confirmText={confirmText}
         confirmTextStyle={confirmTextStyle}
         pickerBackgroundColor={pickerBackgroundColor}
-        itemStyle={pickerItemStyle}
+        itemStyleProps={pickerItemStyle}
         onPressCancel={onPressCancel}
         onPressConfirm={onPressConfirm}
-      />
+      /> */}
     </View>
   );
 
@@ -200,275 +206,3 @@ PhoneInput.defaultProps = {
 
 
 export default PhoneInput;
-
-// const styleType = PropTypes.oneOfType([PropTypes.object, PropTypes.number]);
-
-/*
-
-export default class PhoneInput extends Component {
-  static setCustomCountriesData(json) {
-    Country.setCustomCountriesData(json);
-  }
-
-  constructor(props, context) {
-    super(props, context);
-
-    this.onChangePhoneNumber = this.onChangePhoneNumber.bind(this);
-    this.onPressFlag = this.onPressFlag.bind(this);
-    this.selectCountry = this.selectCountry.bind(this);
-    this.getFlag = this.getFlag.bind(this);
-    this.getISOCode = this.getISOCode.bind(this);
-
-    const { countriesList, disabled, initialCountry } = this.props;
-
-    if (countriesList) {
-      Country.setCustomCountriesData(countriesList);
-    }
-    const countryData = PhoneNumber.getCountryDataByCode(initialCountry);
-
-    this.state = {
-      iso2: initialCountry,
-      disabled,
-      formattedNumber: countryData ? `+${countryData.dialCode}` : "",
-      value: null,
-      inputValue: "",
-    };
-  }
-
-  componentDidMount() {
-    if (this.props.value) {
-      this.updateFlagAndFormatNumber(this.props.value);
-    }
-  }
-
-  componentDidUpdate() {
-    const { value, disabled } = this.props;
-    this.setState({ disabled });
-
-    if (value && value !== this.state.value) {
-      this.setState({ value });
-      this.updateFlagAndFormatNumber(value);
-    }
-  }
-
-  onChangePhoneNumber(number) {
-    const actionAfterSetState = this.props.onChangePhoneNumber
-      ? () => {
-        this.props.onChangePhoneNumber(number);
-      }
-      : null;
-    this.updateFlagAndFormatNumber(number, actionAfterSetState);
-  }
-
-  onPressFlag() {
-    if (this.props.onPressFlag) {
-      this.props.onPressFlag();
-    } else {
-      if (this.state.iso2) this.picker.selectCountry(this.state.iso2);
-      this.picker.show();
-    }
-  }
-
-  getPickerData() {
-    return PhoneNumber.getAllCountries().map((country, index) => ({
-      key: index,
-      image: Flags.get(country.iso2),
-      label: country.name,
-      dialCode: `+${country.dialCode}`,
-      iso2: country.iso2
-    }));
-  }
-
-  getCountryCode() {
-    const countryData = PhoneNumber.getCountryDataByCode(this.state.iso2);
-    return countryData ? countryData.dialCode : null;
-  }
-
-  getAllCountries() {
-    return PhoneNumber.getAllCountries();
-  }
-
-  getFlag(iso2) {
-    return Flags.get(iso2);
-  }
-
-  getDialCode() {
-    return PhoneNumber.getDialCode(this.state.formattedNumber);
-  }
-
-  getValue() {
-    return this.state.formattedNumber.replace(/\s/g, '');
-  }
-
-  getNumberType() {
-    return PhoneNumber.getNumberType(
-      this.state.formattedNumber,
-      this.state.iso2
-    );
-  }
-
-  getISOCode() {
-    return this.state.iso2;
-  }
-
-  selectCountry(iso2) {
-    if (this.state.iso2 !== iso2) {
-      const countryData = PhoneNumber.getCountryDataByCode(iso2);
-      if (countryData) {
-        this.setState(
-          {
-            iso2,
-            formattedNumber: `+${countryData.dialCode}`
-          },
-          () => {
-            this.updateFlagAndFormatNumber(this.state.inputValue)
-            if (this.props.onSelectCountry) this.props.onSelectCountry(iso2);
-          }
-        );
-      }
-    }
-  }
-
-  isValidNumber() {
-    if (this.state.inputValue.length < 3) return false;
-    return PhoneNumber.isValidNumber(
-      this.state.formattedNumber,
-      this.state.iso2
-    );
-  }
-
-  format(text) {
-    return this.props.autoFormat
-      ? PhoneNumber.format(text, this.state.iso2)
-      : text;
-  }
-
-  updateFlagAndFormatNumber(number, actionAfterSetState = null) {
-    const { allowZeroAfterCountryCode, initialCountry } = this.props;
-    let iso2 = this.getISOCode() || initialCountry;
-    let formattedPhoneNumber = number;
-    if (number) {
-      const countryCode = this.getCountryCode();
-      if (formattedPhoneNumber[0] !== "+" && countryCode !== null) {
-        formattedPhoneNumber = '+' + countryCode.toString() + formattedPhoneNumber.toString();
-      }
-      formattedPhoneNumber = allowZeroAfterCountryCode
-        ? formattedPhoneNumber
-        : this.possiblyEliminateZeroAfterCountryCode(formattedPhoneNumber);
-      iso2 = PhoneNumber.getCountryCodeOfNumber(formattedPhoneNumber);
-    }
-    this.setState({ iso2, formattedNumber: formattedPhoneNumber, inputValue: number }, actionAfterSetState);
-  }
-
-  possiblyEliminateZeroAfterCountryCode(number) {
-    const dialCode = PhoneNumber.getDialCode(number);
-    return number.startsWith(`${dialCode}0`)
-      ? dialCode + number.substr(dialCode.length + 1)
-      : number;
-  }
-
-  focus() {
-    this.inputPhone.focus();
-  }
-
-  blur() {
-    this.inputPhone.blur();
-  }
-
-  render() {
-    const { iso2, inputValue, disabled } = this.state;
-    const TextComponent = this.props.textComponent || TextInput;
-    return (
-      <View style={[styles.container, this.props.style]}>
-        <TouchableWithoutFeedback
-          onPress={this.onPressFlag}
-          disabled={disabled}
-        >
-          <Image
-            source={Flags.get(iso2)}
-            style={[styles.flag, this.props.flagStyle]}
-            onPress={this.onPressFlag}
-          />
-        </TouchableWithoutFeedback>
-        <View style={{ flex: 1, marginLeft: this.props.offset || 10 }}>
-          <TextComponent
-            ref={ref => {
-              this.inputPhone = ref;
-            }}
-            editable={!disabled}
-            autoCorrect={false}
-            style={[styles.text, this.props.textStyle]}
-            onChangeText={text => {
-              this.onChangePhoneNumber(text);
-            }}
-            keyboardType="phone-pad"
-            underlineColorAndroid="rgba(0,0,0,0)"
-            value={inputValue}
-            {...this.props.textProps}
-          />
-        </View>
-
-        <CountryPicker
-          ref={ref => {
-            this.picker = ref;
-          }}
-          selectedCountry={iso2}
-          onSubmit={this.selectCountry}
-          buttonColor={this.props.pickerButtonColor}
-          buttonTextStyle={this.props.pickerButtonTextStyle}
-          cancelText={this.props.cancelText}
-          cancelTextStyle={this.props.cancelTextStyle}
-          confirmText={this.props.confirmText}
-          confirmTextStyle={this.props.confirmTextStyle}
-          pickerBackgroundColor={this.props.pickerBackgroundColor}
-          itemStyle={this.props.pickerItemStyle}
-          onPressCancel={this.props.onPressCancel}
-          onPressConfirm={this.props.onPressConfirm}
-        />
-      </View>
-    );
-  }
-}
-
-const styleType = PropTypes.oneOfType([PropTypes.object, PropTypes.number]);
-
-PhoneInput.propTypes = {
-  textComponent: PropTypes.func,
-  initialCountry: PropTypes.string,
-  onChangePhoneNumber: PropTypes.func,
-  value: PropTypes.string,
-  style: styleType,
-  flagStyle: styleType,
-  textStyle: styleType,
-  offset: PropTypes.number,
-  textProps: PropTypes.object,
-  onSelectCountry: PropTypes.func,
-  onPressCancel: PropTypes.func,
-  onPressConfirm: PropTypes.func,
-  pickerButtonColor: PropTypes.string,
-  pickerBackgroundColor: PropTypes.string,
-  pickerItemStyle: styleType,
-  countriesList: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string,
-      iso2: PropTypes.string,
-      dialCode: PropTypes.string,
-      priority: PropTypes.number,
-      areaCodes: PropTypes.arrayOf(PropTypes.string)
-    })
-  ),
-  cancelText: PropTypes.string,
-  cancelTextStyle: styleType,
-  confirmText: PropTypes.string,
-  confirmTextTextStyle: styleType,
-  disabled: PropTypes.bool,
-  allowZeroAfterCountryCode: PropTypes.bool
-};
-
-PhoneInput.defaultProps = {
-  initialCountry: "us",
-  disabled: false,
-  allowZeroAfterCountryCode: true
-};
-
-*/

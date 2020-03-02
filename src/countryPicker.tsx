@@ -1,11 +1,140 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from "react";
 import { Text, TouchableOpacity, View, Modal, Picker } from 'react-native';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 
 import Country from './country';
 import styles from './styles';
 
 const PickerItem = Picker.Item;
+
+
+interface CountryPickerProps {
+  buttonColorProps: string,
+  labels?: any,
+  confirmText: string,
+  cancelText: string,
+  itemStyleProps: any,
+  onSubmit: any,
+  onPressCancel: any,
+  onPressConfirm: any,
+  selectedCountryProps: any,
+  ref: any,
+  buttonTextStyle: any,
+  pickerBackgroundColor: any,
+  cancelTextStyle: any,
+  confirmTextStyle: any
+}
+
+const CountryPicker: React.FC<CountryPickerProps> = ({ confirmTextStyle, cancelTextStyle, cancelText, confirmText, buttonTextStyle, ref, onSubmit, onPressConfirm, buttonColorProps, selectedCountryProps, itemStyleProps, pickerBackgroundColor }) => {
+  const [buttonColor, setButtonColor] = useState(buttonColorProps || '#007AFF');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(selectedCountryProps || Country({CgetAllRequest: true})[0]);
+  const itemStyle = itemStyleProps || {};
+
+  useEffect(() => {
+    setSelectedCountry(selectedCountryProps);
+  });
+
+  const selectCountry = (selectedCountry: any) => {
+    setSelectedCountry(selectedCountry)
+  }
+
+  const onPressCancel = () => {
+    if (onPressCancel) {
+      onPressCancel();
+    }
+    setModalVisible(false);
+  }
+
+  const onPressSubmit = () => {
+    if (onPressConfirm) {
+      onPressConfirm();
+    }
+
+    if (onSubmit) {
+      onSubmit(selectedCountry);
+    }
+    setModalVisible(false);
+  }
+
+  const onValueChange = (selectedCountry: any) => {
+    setSelectedCountry(selectedCountry);
+  }
+
+  const show = () => {
+    setModalVisible(true);
+  }
+
+  const renderItem = (country: any, index: any) => {
+    return <PickerItem key={country.iso2} value={country.iso2} label={country.name} />;
+  }
+
+  let pickerData: any = Country({CgetAllRequest: true});
+  if(pickerData == null) {
+    pickerData = [];
+  }
+
+  return (
+    <Modal
+      animationType="slide"
+      transparent
+      visible={modalVisible}
+      onRequestClose={() => {
+        console.log('Country picker has been closed.');
+      }}
+    >
+      <View style={styles.basicContainer}>
+        <View
+          style={[
+            styles.modalContainer,
+            { backgroundColor: pickerBackgroundColor || 'white' },
+          ]}
+        >
+          <View style={styles.buttonView}>
+            <TouchableOpacity onPress={onPressCancel}>
+              <Text style={[{ color: buttonColor }, buttonTextStyle]}>
+                {cancelText || 'Cancel'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={onPressSubmit}>
+              <Text style={[{ color: buttonColor }, buttonTextStyle]}>
+                {confirmText || 'Confirm'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.mainBox}>
+            <Picker
+              // ref={(ref) => {
+              //   this.picker = ref;
+              // }}
+              style={styles.bottomPicker}
+              selectedValue={selectedCountry}
+              onValueChange={country => onValueChange(country)}
+              itemStyle={itemStyle}
+              mode="dialog"
+            >
+              {pickerData.map((country, index) => renderItem(country, index))}
+            </Picker>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+
+};
+
+CountryPicker.defaultProps = {
+
+} as Partial<CountryPickerProps>
+
+export default CountryPicker;
+
+
+
+
+/*
 
 const propTypes = {
   buttonColor: PropTypes.string,
@@ -140,3 +269,6 @@ export default class CountryPicker extends Component {
 }
 
 CountryPicker.propTypes = propTypes;
+
+
+*/

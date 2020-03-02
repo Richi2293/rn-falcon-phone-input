@@ -46,4 +46,7 @@ export default StyleSheet.create({
     padding: 0,
     justifyContent: 'center',
   },
+  mainBox: {
+
+  }
 });
